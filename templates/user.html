@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="">
+    <div class="float-right">
+        <span class="text-light bg-primary h4 "><strong>Attendance</strong></span>
+        <button type="button" class="btn btn-primary btn-circle btn-lg " data-toggle="modal"
+            data-target="#exampleModalCenter" onclick="getLocation()">
+            <i class="fa fa-plus"></i>
+        </button>
+        
+        
+    </div>
+    <br><br><br>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="exampleModalLongTitle">Your Attendance</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'attend' %}" id="myform" method="POST">
+                        <div class="contentarea">
+                            <h1>
+                                Click To Give Your Attendance
+                            </h1>
+                            <div class="camera">
+                                <video id="video">Video stream not available.</video>
+                            </div>
+                            <!-- <div><button id="startbutton">Take photo</button></div> -->
+                            <canvas id="canvas"></canvas>
+                            <div class="output">
+                                <img id="photo" alt="The screen capture will appear in this box.">
+                            </div>
+                        </div>
+                    <!-- <form action="{% url 'attend' %}" method="POST"> -->
+                        {% csrf_token %}
+                        <input class="form-control" id="img_url" type="text" name="image">
+                        <input class="form-control" id="lat" type="text" name="latitude">
+                        <input class="form-control" id="lon" type="text" name="longitude">
+                        <br>
+                        <div class="d-flex justify-content-center">
+                        <button class="btn btn-outline-warning h1" id="startbutton" type=""> I am Present</button>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br><br>
+    {% if attend %}
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Your Attendance.</h4>
+            <!-- <nav id="navbar-example2" class="navbar navbar-light bg-light">
+                    <a class="navbar-brand text-muted" href="#">Navbar</a>
+                    <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#fat">First</a>
+                        </li>
+                         <li class="nav-item">
+                            <a class="nav-link" href="#mdo">Second</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+                                aria-haspopup="true" aria-expanded="false">Third with Dropdown</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#one">one</a>
+                                <a class="dropdown-item" href="#two">two</a>
+                                <div role="separator" class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#three">three</a>
+                            </div>
+                        </li> 
+                    </ul>
+                </nav> -->
+            <div data-spy="scroll" data-target="#navbar-example2" data-offset="0" class="position-relative mt-2"
+                style="height: 200px; overflow: auto;">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- <h4 class="card-title">Kitchen Sink</h4>
+                            <h5 class="card-subtitle">Swipe Mode, ModeSwitch, Minimap, Sortable, SortableSwitch</h5> -->
+                        <table class="tablesaw table-bordered table-hover table no-wrap" data-tablesaw-mode="swipe"
+                            data-tablesaw-sortable data-tablesaw-sortable-switch data-tablesaw-minimap
+                            data-tablesaw-mode-switch>
+                            <thead>
+                                <tr>
+                                    <th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist"
+                                        class="border">
+                                        #</th>
+                                    <th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist"
+                                        class="border">
+                                        Attendance </th>
+                                    <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col
+                                        data-tablesaw-priority="3" class="border">Date</th>
+                                    <th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="2" class="border">
+                                        Image
+                                    </th>
+                                    <th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="2" class="border">
+                                        Location
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in attend %}
+                                <tr>
+                                    <td>{{forloop.counter}}</td>
+                                    <td>{{p.attendance}}</td>
+                                    <td>{{p.attend_date}}</td>
+                                    <td><a target="_blank" href="{{p.image}}"><img src="{{p.image}}" alt="" width="40px"></a></td>
+                                    {% if p.latitude and p.longitude %}
+                                    <td><a target="_blank" href="https://maps.google.com/?q={{p.latitude}},{{p.longitude}}">location</a></td>
+                                    {% else %}
+                                    <td></td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+    
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
+
+
+
+</div>
+
+<script>
+    /* JS comes here */
+        (function () {
+
+            var width = 320; // We will scale the photo width to this
+            var height = 0; // This will be computed based on the input stream
+
+            var streaming = false;
+
+            var video = null;
+            var canvas = null;
+            var photo = null;
+            var startbutton = null;
+
+            function startup() {
+                video = document.getElementById('video');
+                canvas = document.getElementById('canvas');
+                photo = document.getElementById('photo');
+                startbutton = document.getElementById('startbutton');
+
+                navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false
+                })
+                    .then(function (stream) {
+                        video.srcObject = stream;
+                        video.play();
+                    })
+                    .catch(function (err) {
+                        console.log("An error occurred: " + err);
+                    });
+
+                video.addEventListener('canplay', function (ev) {
+                    if (!streaming) {
+                        height = video.videoHeight / (video.videoWidth / width);
+
+                        if (isNaN(height)) {
+                            height = width / (4 / 3);
+                        }
+
+                        video.setAttribute('width', width);
+                        video.setAttribute('height', height);
+                        canvas.setAttribute('width', width);
+                        canvas.setAttribute('height', height);
+                        streaming = true;
+                    }
+                }, false);
+
+                startbutton.addEventListener('click', function (ev) {
+                    takepicture();
+                    ev.preventDefault();
+                }, false);
+
+                clearphoto();
+            }
+
+
+            function clearphoto() {
+                var context = canvas.getContext('2d');
+                context.fillStyle = "#AAA";
+                context.fillRect(0, 0, canvas.width, canvas.height);
+
+                var data = canvas.toDataURL('image/png');
+                photo.setAttribute('src', data);
+            }
+
+            function takepicture() {
+                var context = canvas.getContext('2d');
+                if (width && height) {
+                    canvas.width = width;
+                    canvas.height = height;
+                    context.drawImage(video, 0, 0, width, height);
+
+                    var data = canvas.toDataURL('image/png');
+                    document.getElementById('img_url').value = data;
+                    console.log("pic: " + data)
+                    photo.setAttribute('src', data);
+                    document.getElementById("myform").submit();
+                } else {
+                    clearphoto();
+                }
+            }
+
+            window.addEventListener('load', startup, false);
+        })();
+
+        var img = document.getElementById('img_url')
+        var lat = document.getElementById('lat')
+        var lon = document.getElementById('lon')
+        img.setAttribute("type", "hidden");
+        lat.setAttribute("type", "hidden");
+        lon.setAttribute("type", "hidden");
+
+        // Live Location code.......
+
+        function getLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition);
+                } else {
+                    x.innerHTML = "Geolocation is not supported by this browser.";
+                }
+            }
+
+        function showPosition(position) {
+            var lat = document.getElementById('lat').value = position.coords.latitude;
+            var lon = document.getElementById('lon').value = position.coords.longitude;
+            console.log("lat: "+lat)
+            console.log("lon: "+lon)
+        }
+        
+</script>
+
+{% endblock %}

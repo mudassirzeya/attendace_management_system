@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" >
+    <br><br><br><br><br>
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">My Users Attendance.</h4>
+        <!-- <nav id="navbar-example2" class="navbar navbar-light bg-light">
+                <a class="navbar-brand text-muted" href="#">Navbar</a>
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#fat">First</a>
+                    </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="#mdo">Second</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+                            aria-haspopup="true" aria-expanded="false">Third with Dropdown</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#one">one</a>
+                            <a class="dropdown-item" href="#two">two</a>
+                            <div role="separator" class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#three">three</a>
+                        </div>
+                    </li> 
+                </ul>
+            </nav> -->
+        <div data-spy="scroll" data-target="#navbar-example2" data-offset="0" class="position-relative mt-2"
+            style="height: 200px; overflow: auto;">
+            <div class="card">
+                <div class="card-body">
+                    <!-- <h4 class="card-title">Kitchen Sink</h4>
+                        <h5 class="card-subtitle">Swipe Mode, ModeSwitch, Minimap, Sortable, SortableSwitch</h5> -->
+                    <table class="tablesaw table-bordered table-hover table no-wrap" data-tablesaw-mode="swipe"
+                        data-tablesaw-sortable data-tablesaw-sortable-switch data-tablesaw-minimap
+                        data-tablesaw-mode-switch>
+                        <thead>
+                            <tr>
+                                <th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist"
+                                    class="border">
+                                    Username</th>
+                                <th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist"
+                                    class="border">
+                                     Name</th>
+                                <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col
+                                    data-tablesaw-priority="3" class="border">Status</th>
+                                <th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="2" class="border">
+                                    Date
+                                </th>
+                                <th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="2" class="border"> Location </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for n in alluser %}
+                        {% for u in n %}
+                        <tr>
+                        
+                            <td>{{u.user.username}}</td>
+                            <td>{{u.user.first_name}}</td>
+                            <td>{{u.attendance}}</td>
+                            <td>{{u.attend_date}}</td>
+                            <td><a target="_blank" href="https://maps.google.com/?q={{u.latitude}},{{u.longitude}}">location</a></td>
+                        </tr>
+                        {% endfor %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</div>
+{% endblock %}
